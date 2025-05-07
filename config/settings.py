@@ -91,7 +91,7 @@ STORAGES = {
         },
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "storages.backends.s3.S3Storage",
     },
 }
 
@@ -168,9 +168,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom user model
 AUTH_USER_MODEL = "authentication.User"
-
-
-STATIC_ROOT = BASE_DIR / "productionfiles"
 
 
 # CORS
