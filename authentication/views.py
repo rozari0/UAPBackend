@@ -87,13 +87,13 @@ class AuthController:
 
 @api_controller("/dashboard", auth=SimpleTokenAuth(), tags=["Dashboard"])
 class DashboardController:
-    @http_get("/me", response=SelfUserResponse)
-    def welcome(self, request):
+    @http_get("self_profile/", response=ProfileResponse)
+    def get_self_profile(self, request):
         request.user.cv = request.user.resume.resume_file
         return request.user
 
-    @http_get("self_profile/", response=ProfileResponse)
-    def get_user(self, request):
+    @http_get("/me", response=SelfUserResponse)
+    def get_self(self, request):
         UserProfile.objects.get_or_create(user=request.user)
         request.user.profile.first_name = request.user.first_name
         request.user.profile.last_name = request.user.last_name
@@ -101,9 +101,7 @@ class DashboardController:
         return request.user.profile
 
     @http_get(
-        "profile/{username}",
-        response={200: ProfileResponse, 404: ErrorResponse},
-        auth=None,
+        "/{username}", response={200: ProfileResponse, 404: ErrorResponse}, auth=None
     )
     def get_user_by_username(self, request, username: str):
         """
