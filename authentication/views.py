@@ -2,12 +2,13 @@
 from typing import Optional
 
 from django.contrib.auth import authenticate
+from django.shortcuts import get_object_or_404
 from ninja import File, ModelSchema, Schema, UploadedFile
 from ninja_extra import api_controller, http_get, http_post
 
 from authentication.auth import SimpleTokenAuth
 
-from .models import AuthToken, Resume, User, UserProfile
+from .models import AuthToken, EmployerProfile, Resume, User, UserProfile
 
 
 class LoginSchema(Schema):
@@ -47,6 +48,16 @@ class ProfileResponse(ModelSchema):
 
 class ErrorResponse(Schema):
     detail: str
+
+
+class EmployerProfileResponse(ModelSchema):
+    first_name: str
+    last_name: str
+    email: str
+
+    class Meta:
+        model = EmployerProfile
+        fields = "__all__"
 
 
 @api_controller("/auth", tags=["Authentication"])
@@ -120,6 +131,10 @@ class DashboardController:
             return 404, {"detail": "User not found"}
 
 
+class SetType(Schema):
+    user_type: str
+
+
 @api_controller("/profile", auth=SimpleTokenAuth(), tags=["Profile"])
 class ProfileController:
     @http_get("/me", response=SelfUserResponse)
@@ -127,16 +142,16 @@ class ProfileController:
         return request.user
 
     @http_post("/settype", response={200: SelfUserResponse, 400: ErrorResponse})
-    def set_user_type(self, request, user_type: str):
+    def set_user_type(self, request, data: SetType):
         """
         Set the user type for the authenticated user.
         Choices are 'seeker' and 'employer'."
         """
-        if user_type not in ["seeker", "employer"]:
+        if data.user_type not in ["seeker", "employer"]:
             return 400, {"detail": "Invalid user type"}
 
         user = request.user
-        user.user_type = user_type
+        user.user_type = data.user_type
         user.save()
         return 200, user
 
@@ -151,3 +166,20 @@ class ProfileController:
             "detail": "CV uploaded successfully",
             "cv": cv_model.resume_file.url,
         }
+
+
+@api_controller("/employer", tags=["Employer"])
+class EmployerController:
+    @http_get(
+        "/profile/{username}",
+        response={200: EmployerProfileResponse, 404: ErrorResponse},
+    )
+    def employer_profile(self, request, username: str):
+        """
+        Get employer profile
+        """
+        profile = get_object_or_404(EmployerProfile, user__username=username)
+        profile.first_name = profile.user.first_name
+        profile.last_name = profile.user.last_name
+        profile.email = profile.user.email
+        return profile

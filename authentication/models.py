@@ -4,6 +4,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 from course.models import Course, Skill
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # Create your models here.
 
@@ -26,6 +28,20 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+@receiver(post_save, sender=User)
+def user_pre_save(sender, instance, **kwargs):
+    """
+    Signal that prints a message every time the User model is updated.
+    """
+    try:
+        if instance.user_type == "seeker":
+            UserProfile.objects.get_or_create(user=instance)
+        elif instance.user_type == "employer":
+            EmployerProfile.objects.get_or_create(user=instance)
+    except Exception as e:
+        print(f"Error creating user profile: {e}")
 
 
 class Resume(models.Model):
@@ -56,9 +72,22 @@ class UserProfile(models.Model):
     )
     skill = models.ManyToManyField(Course, related_name="users_with_skills", blank=True)
 
-    # profile_picture = models.ImageField(
-    #     upload_to="profile_pictures/", blank=True, null=True
-    # )
+    def __str__(self):
+        return f"{self.user.username}'s Profile"
+
+
+class EmployerProfile(models.Model):
+    """
+    User profile model that extends the custom user model.
+    """
+
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="employer_profile"
+    )
+    bio = models.TextField(blank=True)
+    company = models.CharField(max_length=255, blank=True)
+    website = models.URLField(blank=True)
+    location = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
