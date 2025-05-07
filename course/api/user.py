@@ -5,8 +5,10 @@ from ninja import ModelSchema
 from ninja_extra import api_controller, http_get, http_post
 
 from authentication.auth import SimpleTokenAuth
+from django.db.models import Count, Q
 
 from ..models import Course, Lesson, Skill
+from ninja import FilterSchema
 
 
 class SkillSchema(ModelSchema):
@@ -43,7 +45,23 @@ class CourseController:
     @http_get("/list", response=List[CourseSchema])
     def list_courses(self, request):
         courses = Course.objects.all()
-        print(courses)
+
+        return courses
+
+    @http_post("/filtered", response=List[CourseSchema])
+    def filtered_courses(self, request, skills: List[int] = None):
+        """
+        Get all courses with filter
+        """
+        courses = Course.objects.all()
+        if skills:
+            courses = courses.annotate(
+                skill_match_count=Count("skills", filter=Q(skills__id__in=skills))
+            )
+            # courses = courses.filter(skills__id__in=skills).distinct()
+            courses = courses.filter(skill_match_count__gt=0).order_by(
+                "-skill_match_count"
+            )
         return courses
 
     @http_get("/{course_id}", response=SingleCourseSchema)

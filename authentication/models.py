@@ -54,7 +54,7 @@ class UserProfile(models.Model):
     verified_skills = models.ManyToManyField(
         Skill, related_name="verified_users", blank=True
     )
-    Skill = models.ManyToManyField(Course, related_name="users_with_skills", blank=True)
+    skill = models.ManyToManyField(Course, related_name="users_with_skills", blank=True)
 
     # profile_picture = models.ImageField(
     #     upload_to="profile_pictures/", blank=True, null=True

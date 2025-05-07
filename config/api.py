@@ -2,6 +2,7 @@ from ninja_extra import NinjaExtraAPI
 
 from authentication.views import AuthController, DashboardController, ProfileController
 from course.api.user import CourseController
+from course.api.skills import SkillsController
 
 api = NinjaExtraAPI()
 
@@ -12,4 +13,5 @@ api.register_controllers(
 )
 api.register_controllers(
     CourseController,
+    SkillsController,
 )
