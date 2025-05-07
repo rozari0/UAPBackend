@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 ]
 INSTALLED_APPS += [
     "authentication",
+    "course",
     "ninja",
     "ninja_extra",
     "corsheaders",

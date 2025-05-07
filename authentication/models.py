@@ -2,6 +2,7 @@ import secrets
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from course.models import Course, Skill
 
 # Create your models here.
 
@@ -43,8 +44,16 @@ class UserProfile(models.Model):
     User profile model that extends the custom user model.
     """
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True)
+    completed_course = models.ManyToManyField(
+        Course, related_name="completed_users", blank=True
+    )
+    verified_skills = models.ManyToManyField(
+        Skill, related_name="verified_users", blank=True
+    )
+    Skill = models.ManyToManyField(Course, related_name="users_with_skills", blank=True)
+
     # profile_picture = models.ImageField(
     #     upload_to="profile_pictures/", blank=True, null=True
     # )
