@@ -6,7 +6,7 @@ from ninja_extra import api_controller, http_get, http_post
 
 from authentication.auth import SimpleTokenAuth
 
-from .models import AuthToken, Resume, User
+from .models import AuthToken, Resume, User, UserProfile
 
 
 class LoginSchema(Schema):
@@ -32,6 +32,16 @@ class SelfUserResponse(ModelSchema):
     class Meta:
         model = User
         exclude = "password", "is_superuser", "is_staff", "groups", "user_permissions"
+
+
+class ProfileResponse(ModelSchema):
+    first_name: str
+    last_name: str
+    email: str
+
+    class Meta:
+        model = UserProfile
+        fields = "__all__"
 
 
 class ErrorResponse(Schema):
@@ -81,12 +91,53 @@ class DashboardController:
         request.user.cv = request.user.resume.resume_file
         return request.user
 
+    @http_get("self_profile/", response=ProfileResponse)
+    def get_user(self, request):
+        UserProfile.objects.get_or_create(user=request.user)
+        request.user.profile.first_name = request.user.first_name
+        request.user.profile.last_name = request.user.last_name
+        request.user.profile.email = request.user.email
+        return request.user.profile
+
+    @http_post(
+        "/{username}", response={200: ProfileResponse, 404: ErrorResponse}, auth=None
+    )
+    def get_user_by_username(self, request, username: str):
+        """
+        Get user profile by username.
+        """
+        try:
+            user = User.objects.get(username=username)
+            if user.user_type != "seeker":
+                return 404, {"detail": "User not found"}
+            UserProfile.objects.get_or_create(user=user)
+            user.profile.first_name = user.first_name
+            user.profile.last_name = user.last_name
+            user.profile.email = user.email
+            return user.profile
+        except User.DoesNotExist:
+            return 404, {"detail": "User not found"}
+
 
 @api_controller("/profile", auth=SimpleTokenAuth())
 class ProfileController:
     @http_get("/me", response=SelfUserResponse)
     def me(self, request):
         return request.user
+
+    @http_post("/settype", response={200: SelfUserResponse, 400: ErrorResponse})
+    def set_user_type(self, request, user_type: str):
+        """
+        Set the user type for the authenticated user.
+        Choices are 'seeker' and 'employer'."
+        """
+        if user_type not in ["seeker", "employer"]:
+            return 400, {"detail": "Invalid user type"}
+
+        user = request.user
+        user.user_type = user_type
+        user.save()
+        return 200, user
 
     @http_post("/cv")
     def upload_cv(self, request, file: UploadedFile = File(...)):

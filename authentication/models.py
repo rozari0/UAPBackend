@@ -13,13 +13,14 @@ class User(AbstractUser):
     """
 
     class USER_TYPE_CHOICES(models.TextChoices):
+        SEEKER = "seeker", "Seeker"
+        EMPLOYER = "employer", "Employer"
         ADMIN = "admin", "Admin"
-        USER = "user", "User"
 
     user_type = models.CharField(
         max_length=10,
         choices=USER_TYPE_CHOICES.choices,
-        default=USER_TYPE_CHOICES.USER,
+        null=True,
     )
 
     def __str__(self):
