@@ -23,6 +23,7 @@ db.sqlite3
 
 # Static files
 /static
+/productionfiles
 
 # VS Code
 .vscode/

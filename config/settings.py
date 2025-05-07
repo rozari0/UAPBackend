@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-%)zp(aagi6#4se0zkm1^sv&h&81ck1dq6xz_(23crd_b(fl+sb"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*", ".flink.com.bd"]
 
@@ -52,6 +52,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -128,3 +129,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom user model
 AUTH_USER_MODEL = "authentication.User"
+
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static",
+# ]
+
+STATIC_ROOT = BASE_DIR / "productionfiles"
