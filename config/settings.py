@@ -48,11 +48,14 @@ INSTALLED_APPS += [
     "authentication",
     "ninja",
     "ninja_extra",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    # Cors
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -131,8 +134,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Custom user model
 AUTH_USER_MODEL = "authentication.User"
 
-# STATICFILES_DIRS = [
-#     BASE_DIR / "static",
-# ]
 
 STATIC_ROOT = BASE_DIR / "productionfiles"
+
+
+# CORS
+CORS_ALLOW_ALL_ORIGINS = True
+CSRF_TRUSTED_ORIGINS = ["https://hackathon.flink.com.bd"]
