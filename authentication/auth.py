@@ -1,5 +1,6 @@
 # auth_backend.py
 from ninja.security import HttpBearer
+
 from .models import AuthToken
 
 

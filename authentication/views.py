@@ -1,10 +1,11 @@
 # api/auth.py
-from ninja_extra import api_controller, http_get, http_post
-from ninja import Schema, ModelSchema
 from django.contrib.auth import authenticate
+from ninja import File, ModelSchema, Schema, UploadedFile
+from ninja_extra import api_controller, http_get, http_post
 
 from authentication.auth import SimpleTokenAuth
-from .models import AuthToken, User
+
+from .models import AuthToken, Resume, User
 
 
 class LoginSchema(Schema):
@@ -38,9 +39,8 @@ class ErrorResponse(Schema):
 class AuthController:
     @http_post("/login", response={200: TokenResponse, 401: ErrorResponse})
     def login(self, request, data: LoginSchema):
-        user = authenticate(username=data.username, password=data.password)
+        user = authenticate(username=data.username.lower(), password=data.password)
         if not user:
-            print("test")
             return 401, ErrorResponse(detail="Wrong creds.")
 
         token, _ = AuthToken.objects.get_or_create(user=user)
@@ -75,5 +75,20 @@ class AuthController:
 class DashboardController:
     @http_get("/me", response=SelfUserResponse)
     def welcome(self, request):
-        # print(request.user.id)
         return request.user
+
+
+@api_controller("/profile", auth=SimpleTokenAuth())
+class ProfileController:
+    @http_get("/me", response=SelfUserResponse)
+    def me(self, request):
+        return request.user
+
+    @http_post("/cv")
+    def upload_cv(self, request, file: UploadedFile = File(...)):
+        user = request.user
+        cv_model, _ = Resume.objects.get_or_create(user=user)
+        cv_model.resume_file = file
+        cv_model.save()
+
+        return 200, {"detail": "CV uploaded successfully"}

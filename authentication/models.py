@@ -1,6 +1,7 @@
 import secrets
-from django.db import models
+
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 # Create your models here.
 
@@ -22,6 +23,19 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class Resume(models.Model):
+    """
+    Resume model that stores user resumes.
+    """
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    resume_file = models.FileField(upload_to="resumes/")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s Resume"
 
 
 class UserProfile(models.Model):
