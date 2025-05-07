@@ -85,7 +85,7 @@ class AuthController:
         return 201, {"token": token.key}
 
 
-@api_controller("/dashboard", auth=SimpleTokenAuth())
+@api_controller("/dashboard", auth=SimpleTokenAuth(), tags=["Dashboard"])
 class DashboardController:
     @http_get("/me", response=SelfUserResponse)
     def welcome(self, request):
@@ -100,8 +100,10 @@ class DashboardController:
         request.user.profile.email = request.user.email
         return request.user.profile
 
-    @http_post(
-        "/{username}", response={200: ProfileResponse, 404: ErrorResponse}, auth=None
+    @http_get(
+        "profile/{username}",
+        response={200: ProfileResponse, 404: ErrorResponse},
+        auth=None,
     )
     def get_user_by_username(self, request, username: str):
         """

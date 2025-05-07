@@ -1,7 +1,7 @@
 from ninja_extra import NinjaExtraAPI
 
 from authentication.views import AuthController, DashboardController, ProfileController
-from course.views import CourseController
+from course.api.user import CourseController
 
 api = NinjaExtraAPI()
 
