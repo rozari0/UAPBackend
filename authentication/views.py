@@ -21,15 +21,6 @@ class ErrorResponse(Schema):
     detail: str
     status_code: Optional[int] = None
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "token": "your_token_here",
-                "status_code": 401,
-                "detail": "Invalid credentials",
-            }
-        }
-
 
 class SignupSchema(Schema):
     username: str
