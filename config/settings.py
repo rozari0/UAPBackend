@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-%)zp(aagi6#4se0zkm1^sv&h&81ck1dq6xz_(23crd_b(fl+sb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*", ".flink.com.bd"]
 
 
 # Application definition
@@ -37,6 +37,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+]
+INSTALLED_APPS += [
+    "authentication",
+    "ninja",
+    "ninja_extra",
 ]
 
 MIDDLEWARE = [
@@ -120,3 +125,6 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Custom user model
+AUTH_USER_MODEL = "authentication.User"
