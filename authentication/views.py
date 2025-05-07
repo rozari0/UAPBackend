@@ -1,4 +1,5 @@
 # api/auth.py
+from typing import Optional
 from django.contrib.auth import authenticate
 from ninja import File, ModelSchema, Schema, UploadedFile
 from ninja_extra import api_controller, http_get, http_post
@@ -26,6 +27,8 @@ class SignupSchema(Schema):
 
 
 class SelfUserResponse(ModelSchema):
+    cv: Optional[str] = None
+
     class Meta:
         model = User
         exclude = "password", "is_superuser", "is_staff", "groups", "user_permissions"
@@ -75,6 +78,7 @@ class AuthController:
 class DashboardController:
     @http_get("/me", response=SelfUserResponse)
     def welcome(self, request):
+        request.user.cv = request.user.resume.resume_file
         return request.user
 
 
@@ -91,4 +95,7 @@ class ProfileController:
         cv_model.resume_file = file
         cv_model.save()
 
-        return 200, {"detail": "CV uploaded successfully"}
+        return 200, {
+            "detail": "CV uploaded successfully",
+            "cv": cv_model.resume_file.url,
+        }

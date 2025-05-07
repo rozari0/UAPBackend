@@ -30,7 +30,7 @@ class Resume(models.Model):
     Resume model that stores user resumes.
     """
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="resume")
     resume_file = models.FileField(upload_to="resumes/")
     created_at = models.DateTimeField(auto_now_add=True)
 
