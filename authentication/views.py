@@ -1,5 +1,6 @@
 # api/auth.py
 from typing import Optional
+
 from django.contrib.auth import authenticate
 from ninja import File, ModelSchema, Schema, UploadedFile
 from ninja_extra import api_controller, http_get, http_post
@@ -119,7 +120,7 @@ class DashboardController:
             return 404, {"detail": "User not found"}
 
 
-@api_controller("/profile", auth=SimpleTokenAuth())
+@api_controller("/profile", auth=SimpleTokenAuth(), tags=["Profile"])
 class ProfileController:
     @http_get("/me", response=SelfUserResponse)
     def me(self, request):

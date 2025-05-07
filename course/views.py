@@ -1,10 +1,12 @@
 from typing import List
+
 from django.shortcuts import get_object_or_404
-from ninja_extra import http_post, api_controller, http_get
-from ninja import Schema, ModelSchema
+from ninja import ModelSchema, Schema
+from ninja_extra import api_controller, http_get, http_post
 
 from authentication.auth import SimpleTokenAuth
-from .models import Course, Skill, Lesson
+
+from .models import Course, Lesson, Skill
 
 
 class SkillSchema(ModelSchema):

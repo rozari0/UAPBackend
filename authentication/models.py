@@ -2,6 +2,7 @@ import secrets
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+
 from course.models import Course, Skill
 
 # Create your models here.

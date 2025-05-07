@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Course, Skill, Lesson
+
+from .models import Course, Lesson, Skill
 
 
 class LessonInline(admin.StackedInline):
