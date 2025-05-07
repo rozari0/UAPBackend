@@ -1,5 +1,4 @@
 # api/auth.py
-from typing import Optional
 from ninja_extra import api_controller, http_get, http_post
 from ninja import Schema, ModelSchema
 from django.contrib.auth import authenticate
@@ -17,11 +16,6 @@ class TokenResponse(Schema):
     token: str
 
 
-class ErrorResponse(Schema):
-    detail: str
-    status_code: Optional[int] = None
-
-
 class SignupSchema(Schema):
     username: str
     password: str
@@ -36,19 +30,24 @@ class SelfUserResponse(ModelSchema):
         exclude = "password", "is_superuser", "is_staff", "groups", "user_permissions"
 
 
+class ErrorResponse(Schema):
+    detail: str
+
+
 @api_controller("/auth", tags=["Authentication"])
 class AuthController:
-    @http_post("/login", response=TokenResponse)
+    @http_post("/login", response={200: TokenResponse, 401: ErrorResponse})
     def login(self, request, data: LoginSchema):
         user = authenticate(username=data.username, password=data.password)
         if not user:
-            return {"detail": "Invalid credentials"}, 401
+            print("test")
+            return 401, ErrorResponse(detail="Wrong creds.")
 
         token, _ = AuthToken.objects.get_or_create(user=user)
         token.key = AuthToken.generate_token()
         token.save()
 
-        return {"token": token.key}
+        return 200, {"token": token.key}
 
     @http_post("/signup", response={201: TokenResponse, 400: ErrorResponse})
     def signup(self, request, data: SignupSchema):
